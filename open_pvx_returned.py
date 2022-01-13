@@ -6,7 +6,7 @@ from io import StringIO
 from base64 import b64encode
 
 from pymyreader import pymyreader
-
+from gcs_connect import bucket
 from PVXreader import PvxClient
 
 def open_pvx_returned(start_date, end_date, pvx_password, **kwargs):
@@ -69,5 +69,6 @@ def open_pvx_returned(start_date, end_date, pvx_password, **kwargs):
        PVX_Open_Returned.to_csv('Open PVX + Refunded Magento {} - {}.csv'.format(start_date,end_date),index = False)
 
 
-open_pvx_returned(sys.argv[1],sys.argv[2],sys.argv[3])
+open_pvx = open_pvx_returned(sys.argv[1],sys.argv[2],sys.argv[3])
 
+bucket(open_pvx, 'open_pvx_returns')
