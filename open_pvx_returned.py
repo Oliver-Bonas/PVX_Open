@@ -4,6 +4,7 @@ import sys
 from io import StringIO
 
 from base64 import b64encode
+import json
 
 from pymyreader import pymyreader
 from gcs_connect import bucket
@@ -43,6 +44,8 @@ def open_pvx_returned(start_date, end_date, pvx_password, **kwargs):
 
        magento_orders = pymyreader(magento_order_sql)
 
+       csv_name = 'Open PVX + Refunded Magento {} - {}.csv'.format(start_date,end_date)
+
        if magento_orders.empty:
 
               PVX_Open_Returned = pd.DataFrame(columns = ['magento_order_id','sku','Requested delivery date','Item Name','item_qty_refunded'])
@@ -66,9 +69,20 @@ def open_pvx_returned(start_date, end_date, pvx_password, **kwargs):
               PVX_Open_Returned = PVX_Sales.merge(magento_orders, on = ['magento_order_id','sku']).reset_index()
 
        
-       PVX_Open_Returned.to_csv('Open PVX + Refunded Magento {} - {}.csv'.format(start_date,end_date),index = False)
+       PVX_Open_Returned.to_csv(csv_name, index = False)
 
 
-open_pvx = open_pvx_returned(sys.argv[1],sys.argv[2],sys.argv[3])
+       xcom_return = {"csv_name":csv_name, "output_length":len(PVX_Open_Returned)}
 
-bucket(open_pvx, 'open_pvx_returns')
+       return xcom_return
+
+open_pvx_xcom = open_pvx_returned(sys.argv[1],sys.argv[2],sys.argv[3])
+
+# write to gcs bucket 'open_pvx_returns'
+
+bucket(open_pvx_xcom['csv_name'], 'open_pvx_returns')
+
+# write xcom output to return.json
+
+with open("/airflow/xcom/return.json", "w") as file:
+       json.dump(xcom_return, file)

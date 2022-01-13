@@ -14,5 +14,6 @@ RUN pip3 install -r requirements.txt
 COPY open_pvx_returned.py open_pvx_returned.py 
 COPY pymyreader.py pymyreader.py
 COPY PVXreader.py PVXreader.py
+COPY gcs_connect.py gcs_connect.py
 
 ENTRYPOINT ["python", "open_pvx_returned.py"]

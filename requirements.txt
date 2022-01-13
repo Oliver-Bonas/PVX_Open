@@ -4,4 +4,5 @@ slackclient==2.9.3
 zeep==4.0.0
 openpyxl
 pandas
-
+google.cloud.storage==1.38.0
+json
