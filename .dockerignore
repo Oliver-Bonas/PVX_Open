@@ -3,7 +3,6 @@
 # Allow files and directories
 !/dockerfile
 !/requirements.txt
-!/PVX_Mag_Order_Discrepancy.py
+!/open_pvx_returned.py
 !/pymyreader.py
 !/PVXreader.py
-!/slack_message.py
