@@ -1,0 +1,9 @@
+# Ignore everything
+**
+# Allow files and directories
+!/dockerfile
+!/requirements.txt
+!/PVX_Mag_Order_Discrepancy.py
+!/pymyreader.py
+!/PVXreader.py
+!/slack_message.py
