@@ -33,6 +33,8 @@ def open_pvx_returned(start_date, end_date, pvx_password, **kwargs):
 
        PVX_Sales['Requested date'] = PVX_Sales['Requested delivery date'].dt.date
 
+       PVX_Sales.rename(columns = {'Sales order no.':'magento_order_id','Item code':'sku'}, inplace = True)
+
        # Return all Magento Orders that are cancelled/refunded so James can manually refund them
 
        magento_order_sql = """SELECT o.increment_id as magento_order_id, oi.sku, oi.qty_ordered as item_qty_refunded
@@ -41,10 +43,29 @@ def open_pvx_returned(start_date, end_date, pvx_password, **kwargs):
 
        magento_orders = pymyreader(magento_order_sql)
 
-       magento_orders['item_qty_refunded'] = magento_orders['item_qty_refunded'].astype(int)
+       if magento_orders.empty:
 
-       PVX_Open_Returned = PVX_Sales.merge(magento_orders, left_on = ['Sales order no.','Item code'], right_on = ['magento_order_id','sku'])
+              PVX_Open_Returned = pd.DataFrame(columns = ['magento_order_id','sku','Requested delivery date','Item Name','item_qty_refunded'])
 
+       else:
+       
+              print(start_date, end_date)
+
+              print(magento_orders)
+
+              magento_orders['item_qty_refunded'] = magento_orders['item_qty_refunded'].astype(int)
+
+              magento_orders['sku'] = magento_orders['sku'].astype(str)
+              magento_orders['magento_order_id'] = magento_orders['magento_order_id'].astype(str)
+
+              PVX_Sales['sku'] = PVX_Sales['sku'].astype(str)
+              PVX_Sales['magento_order_id'] = PVX_Sales['magento_order_id'].astype(str)
+
+              
+
+              PVX_Open_Returned = PVX_Sales.merge(magento_orders, on = ['magento_order_id','sku']).reset_index()
+
+       
        PVX_Open_Returned.to_csv('Open PVX + Refunded Magento {} - {}.csv'.format(start_date,end_date),index = False)
 
 
